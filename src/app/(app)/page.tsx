@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   ArrowLeft,
+  ArrowUpRight,
   CalendarDays,
   CalendarPlus,
   ChevronLeft,
@@ -113,7 +114,10 @@ export default function DashboardPage() {
         { href: "/schedule", label: M.dashboard.takeAttendance, icon: UserCheck },
         { href: "/players?new=1", label: M.dashboard.newPlayer, icon: UserPlus },
         { href: "/schedule?new=1", label: M.dashboard.newEvent, icon: CalendarPlus },
-        { href: "/finances", label: M.dashboard.recordPayment, icon: ReceiptText },
+        { href: "/finances", label: M.dashboard.recordPayment, icon: Wallet },
+        ...(isManager
+          ? [{ href: "/finances/ledger?new=expense", label: M.ledger.recordExpense, icon: ArrowUpRight }]
+          : []),
       ];
 
   return (

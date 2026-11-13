@@ -44,6 +44,7 @@ import {
   Select,
   Sheet,
   StatCard,
+  buttonStyles,
   cn,
 } from "@/components/ui";
 import { PaymentSheet } from "@/components/payment-sheet";
@@ -265,14 +266,18 @@ export default function FinancesPage() {
               })
             : t(M.finance.clubSubtitle)
         }
-        action={
-          isManager ? (
-            <Button size="sm" onClick={() => setIssueOpen(true)} className="shrink-0">
+        action={isManager ? (
+          <div className="flex shrink-0 gap-2">
+            <Link href="/finances/ledger?new=expense" className={buttonStyles("outline", "sm")}>
+              <Plus className="h-4 w-4" />
+              {t(M.ledger.recordExpense)}
+            </Link>
+            <Button size="sm" onClick={() => setIssueOpen(true)}>
               <Plus className="h-4 w-4" />
               {t(M.finance.issueBtn)}
             </Button>
-          ) : undefined
-        }
+          </div>
+        ) : undefined}
       />
 
       {isManager ? <FinanceNav /> : null}

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -68,7 +68,7 @@ const chequeTone = (entry: LedgerEntry) =>
       : ("amber" as const);
 
 export default function LedgerPage() {
-  const { data, update, toast } = useClub();
+  const { data, update, toast, isManager } = useClub();
   const t = useT();
   const [monthOffset, setMonthOffset] = useState(0);
   const [kindFilter, setKindFilter] = useState<KindFilter>("all");
@@ -140,6 +140,14 @@ export default function LedgerPage() {
     setSheetKind(kind);
     setTransactionOpen(true);
   };
+
+  useEffect(() => {
+    if (!isManager || new URLSearchParams(window.location.search).get("new") !== "expense") return;
+    setEditEntry(null);
+    setSheetKind("expense");
+    setTransactionOpen(true);
+    window.history.replaceState({}, "", "/finances/ledger");
+  }, [isManager]);
 
   const deleteEntry = () => {
     if (!deleteTarget) return;

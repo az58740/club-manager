@@ -847,6 +847,7 @@ export const M = {
       "All club income and expenses in one book",
     ),
     recordTx: bi("ثبت تراکنش", "Record a transaction"),
+    recordExpense: bi("ثبت هزینه", "Record expense"),
     monthEntries: bi("{count} تراکنش در این ماه", "{count} transactions this month"),
     prevMonth: bi("ماه قبل", "Previous month"),
     thisMonth: bi("ماه جاری", "This month"),
