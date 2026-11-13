@@ -106,6 +106,10 @@ export interface Invoice {
   kind: InvoiceKind;
   period: string;
   title: string;
+  /** Tuition before discount; absent on invoices created by older app versions. */
+  subtotal?: number;
+  /** Discount applied to the invoice; absent on older invoices. */
+  discountAmount?: number;
   amount: number;
   dueAt: string;
   issuedAt: string;

@@ -21,6 +21,58 @@ export const TUITION_CATEGORY_ID = "cat-tuition";
 export const CASH_ACCOUNT_ID = "acc-cash";
 export const BANK_ACCOUNT_ID = "acc-bank";
 
+const jalaliMonthAliases = [
+  ["فروردین", "farvardin"],
+  ["اردیبهشت", "ordibehesht", "ardibehesht"],
+  ["خرداد", "khordad"],
+  ["تیر", "tir"],
+  ["مرداد", "mordad", "murdad", "amordad"],
+  ["شهریور", "shahrivar"],
+  ["مهر", "mehr"],
+  ["آبان", "aban"],
+  ["آذر", "azar"],
+  ["دی", "dey", "day"],
+  ["بهمن", "bahman"],
+  ["اسفند", "esfand"],
+];
+
+function normalizePeriodText(value: string) {
+  return value
+    .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
+    .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+    .normalize("NFKD")
+    .replace(/\p{M}/gu, "")
+    .replace(/[يى]/g, "ی")
+    .replace(/ك/g, "ک")
+    .replace(/[\u200c\s]+/g, " ")
+    .trim()
+    .toLocaleLowerCase();
+}
+
+const normalizedJalaliMonthAliases = jalaliMonthAliases.map((aliases) =>
+  aliases.map(normalizePeriodText),
+);
+
+/** Canonical comparison key for free-form Jalali invoice periods; stored labels remain unchanged. */
+export function normalizeInvoicePeriod(value: string) {
+  const normalized = normalizePeriodText(value);
+  const numericPeriod = normalized.match(/^(\d{4})\s*[-/]\s*(\d{1,2})$/);
+  if (numericPeriod) {
+    const month = Number(numericPeriod[2]);
+    if (month >= 1 && month <= 12) {
+      return `${numericPeriod[1]}-${String(month).padStart(2, "0")}`;
+    }
+  }
+
+  const tokens = normalized.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+  const year = tokens.find((token) => /^\d{4}$/.test(token));
+  const monthIndex = normalizedJalaliMonthAliases.findIndex((aliases) =>
+    aliases.some((alias) => tokens.includes(alias)),
+  );
+  if (year && monthIndex >= 0) return `${year}-${String(monthIndex + 1).padStart(2, "0")}`;
+  return normalized;
+}
+
 export function accountById(data: ClubData, accountId: string) {
   return data.accounts.find((account) => account.id === accountId);
 }

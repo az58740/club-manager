@@ -12,6 +12,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { useClub } from "@/lib/store";
+import { normalizeInvoicePeriod } from "@/lib/finance";
 import {
   invoicePaidAmount,
   invoiceRemaining,
@@ -110,7 +111,9 @@ export default function FinancesPage() {
     [data.invoices, isPlayer, myPlayerId],
   );
 
-  const periodInvoices = scopeInvoices.filter((invoice) => invoice.period === currentPeriod);
+  const periodInvoices = scopeInvoices.filter(
+    (invoice) => normalizeInvoicePeriod(invoice.period) === normalizeInvoicePeriod(currentPeriod),
+  );
   const periodTotal = periodInvoices.reduce((sum, invoice) => sum + invoice.amount, 0);
   const periodPaid = periodInvoices.reduce(
     (sum, invoice) => sum + invoicePaidAmount(invoice, data),
@@ -207,7 +210,7 @@ export default function FinancesPage() {
             (invoice) =>
               invoice.playerId === player.id &&
               invoice.kind === issueKind &&
-              invoice.period === issuePeriod.trim(),
+              normalizeInvoicePeriod(invoice.period) === normalizeInvoicePeriod(issuePeriod.trim()),
           ),
       )
       .map((player) => ({

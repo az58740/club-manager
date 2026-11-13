@@ -42,6 +42,7 @@ import type { Invoice } from "@/lib/types";
 import { Avatar, Badge, Button, Card, EmptyState, Progress, Segmented, cn } from "@/components/ui";
 import { PlayerFormSheet } from "@/components/player-form";
 import { PaymentSheet } from "@/components/payment-sheet";
+import { TuitionReceiptSheet } from "@/components/tuition-receipt-sheet";
 
 type Tab = "stats" | "attendance" | "finance";
 
@@ -71,6 +72,7 @@ export default function PlayerProfilePage({ recordId }: { recordId: string }) {
   const [tab, setTab] = useState<Tab>("stats");
   const [editOpen, setEditOpen] = useState(false);
   const [paymentInvoiceId, setPaymentInvoiceId] = useState<string | null>(null);
+  const [tuitionReceiptOpen, setTuitionReceiptOpen] = useState(false);
 
   useEffect(() => {
     if (isPlayer && currentUser?.playerId && id && id !== currentUser.playerId) {
@@ -367,66 +369,83 @@ export default function PlayerProfilePage({ recordId }: { recordId: string }) {
       ) : null}
 
       {tab === "finance" && canSeeFinance ? (
-        invoices.length ? (
-          <div className="space-y-2.5">
-            {invoices.map((invoice) => {
-              const badge = invoiceBadge(invoice, data);
-              const paid = invoicePaidAmount(invoice, data);
-              const remaining = invoiceRemaining(invoice, data);
-              const progress = invoice.amount ? (paid / invoice.amount) * 100 : 0;
-              return (
-                <Card key={invoice.id} className="p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-[13px] font-semibold text-ink">{invoice.title}</p>
-                      <p className="mt-0.5 text-[10px] text-muted">
-                        {t(M.players.dueOn, { date: formatDateFull(invoice.dueAt) })}
-                      </p>
+        <div className="space-y-3">
+          {canPay ? (
+            <Button className="w-full" onClick={() => setTuitionReceiptOpen(true)}>
+              <ReceiptText className="h-4 w-4" />
+              {t(M.payment.receiveTuition)}
+            </Button>
+          ) : null}
+          {invoices.length ? (
+            <div className="space-y-2.5">
+              {invoices.map((invoice) => {
+                const badge = invoiceBadge(invoice, data);
+                const paid = invoicePaidAmount(invoice, data);
+                const remaining = invoiceRemaining(invoice, data);
+                const progress = invoice.amount ? (paid / invoice.amount) * 100 : 0;
+                const discount = invoice.discountAmount ?? 0;
+                return (
+                  <Card key={invoice.id} className="p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-[13px] font-semibold text-ink">{invoice.title}</p>
+                        <p className="mt-0.5 text-[10px] text-muted">
+                          {t(M.players.dueOn, { date: formatDateFull(invoice.dueAt) })}
+                        </p>
+                        {invoice.subtotal !== undefined || discount > 0 ? (
+                          <div className="mt-1 space-y-0.5 text-[10px] text-muted">
+                            <p>
+                              {t(M.payment.tuitionSubtotal)}: {toman(invoice.subtotal ?? invoice.amount + discount)}
+                              {discount > 0 ? ` · ${t(M.payment.discountWord)}: −${toman(discount)}` : ""}
+                            </p>
+                          </div>
+                        ) : null}
+                      </div>
+                      <Badge tone={badge.tone}>{t(badge.message)}</Badge>
                     </div>
-                    <Badge tone={badge.tone}>{t(badge.message)}</Badge>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between text-[11px]">
-                    <span className="text-muted">
-                      {t(M.players.paidOf, { paid: toman(paid), total: toman(invoice.amount) })}
-                    </span>
-                    <span
-                      className={cn(
-                        "font-bold",
-                        remaining > 0 ? "text-rose-600" : "text-emerald-600",
-                      )}
-                    >
-                      {remaining > 0
-                        ? t(M.players.remaining, { amount: toman(remaining) })
-                        : t(M.players.settledChip)}
-                    </span>
-                  </div>
-                  <Progress
-                    value={progress}
-                    className="mt-2"
-                    tone={remaining > 0 ? "bg-amber-500" : "bg-emerald-500"}
-                  />
-                  {canPay && remaining > 0 ? (
-                    <Button
-                      size="sm"
-                      variant="soft"
-                      className="mt-3 w-full"
-                      onClick={() => setPaymentInvoiceId(invoice.id)}
-                    >
-                      <ReceiptText className="h-3.5 w-3.5" />
-                      {t(M.dashboard.recordPayment)}
-                    </Button>
-                  ) : null}
-                </Card>
-              );
-            })}
-          </div>
-        ) : (
-          <EmptyState
-            icon={<Wallet className="h-5 w-5" />}
-            title={t(M.players.noInvoiceTitle)}
-            description={t(M.players.noInvoiceDesc)}
-          />
-        )
+                    <div className="mt-3 flex items-center justify-between text-[11px]">
+                      <span className="text-muted">
+                        {t(M.players.paidOf, { paid: toman(paid), total: toman(invoice.amount) })}
+                      </span>
+                      <span
+                        className={cn(
+                          "font-bold",
+                          remaining > 0 ? "text-rose-600" : "text-emerald-600",
+                        )}
+                      >
+                        {remaining > 0
+                          ? t(M.players.remaining, { amount: toman(remaining) })
+                          : t(M.players.settledChip)}
+                      </span>
+                    </div>
+                    <Progress
+                      value={progress}
+                      className="mt-2"
+                      tone={remaining > 0 ? "bg-amber-500" : "bg-emerald-500"}
+                    />
+                    {canPay && remaining > 0 ? (
+                      <Button
+                        size="sm"
+                        variant="soft"
+                        className="mt-3 w-full"
+                        onClick={() => setPaymentInvoiceId(invoice.id)}
+                      >
+                        <ReceiptText className="h-3.5 w-3.5" />
+                        {t(M.dashboard.recordPayment)}
+                      </Button>
+                    ) : null}
+                  </Card>
+                );
+              })}
+            </div>
+          ) : (
+            <EmptyState
+              icon={<Wallet className="h-5 w-5" />}
+              title={t(M.players.noInvoiceTitle)}
+              description={t(M.players.noInvoiceDesc)}
+            />
+          )}
+        </div>
       ) : null}
 
       {canEdit ? (
@@ -442,6 +461,13 @@ export default function PlayerProfilePage({ recordId }: { recordId: string }) {
         onClose={() => setPaymentInvoiceId(null)}
         invoiceId={paymentInvoiceId}
       />
+      {canPay ? (
+        <TuitionReceiptSheet
+          player={player}
+          open={tuitionReceiptOpen}
+          onClose={() => setTuitionReceiptOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }
