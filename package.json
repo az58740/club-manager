@@ -1,0 +1,35 @@
+{
+  "name": "c4cdd6a7",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "node scripts/fetch-emza-assets.mjs && next build && node scripts/gen-sw-manifest.mjs",
+    "emza:assets": "node scripts/fetch-emza-assets.mjs",
+    "codec:fixtures": "node scripts/gen-codec-fixtures.mjs",
+    "start": "next start",
+    "serve:out": "node scripts/serve-out.mjs 3201"
+  },
+  "dependencies": {
+    "@fontsource-variable/vazirmatn": "^5.3.0",
+    "@huggingface/transformers": "^4.3.2",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.118.0",
+    "clsx": "^2.1.1",
+    "jalaali-js": "^2.0.1",
+    "lucide-react": "^1.61.0",
+    "next": "16.4.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.15",
+    "@electric-sql/pglite-socket": "^0.2.18",
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

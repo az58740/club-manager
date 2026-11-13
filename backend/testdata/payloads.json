@@ -1,0 +1,386 @@
+{
+  "club": [
+    {
+      "case": "full",
+      "payload": {
+        "name": "Sample",
+        "shortName": "Sample",
+        "sport": "volleyball",
+        "city": "Tehran",
+        "founded": "1385",
+        "phone": "09123456789",
+        "season": "1404-1405",
+        "logo": "data:image/png;base64,AAAA"
+      }
+    },
+    {
+      "case": "bare",
+      "payload": {
+        "name": "Sample",
+        "shortName": "Sample",
+        "sport": "volleyball",
+        "city": "Tehran",
+        "founded": "1385",
+        "phone": "09123456789",
+        "season": "1404-1405"
+      }
+    }
+  ],
+  "teams": [
+    {
+      "case": "full",
+      "payload": {
+        "id": "r-teams",
+        "name": "Sample",
+        "ageGroup": "Youth",
+        "coach": "Sample Coach",
+        "color": "blue",
+        "season": "1404-1405",
+        "homeVenue": "Hall 1"
+      }
+    },
+    {
+      "case": "bare",
+      "payload": {
+        "id": "r-teams",
+        "name": "Sample",
+        "ageGroup": "Youth",
+        "coach": "Sample Coach",
+        "color": "blue",
+        "season": "1404-1405",
+        "homeVenue": "Hall 1"
+      }
+    }
+  ],
+  "players": [
+    {
+      "case": "full",
+      "payload": {
+        "id": "r-players",
+        "fullName": "Sample Player",
+        "phone": "09123456789",
+        "teamId": "t-fixture-1",
+        "position": "setter",
+        "jersey": 7,
+        "birthDate": "2025-03-21",
+        "heightCm": 188,
+        "status": "active",
+        "joinedAt": "2025-03-21",
+        "monthlyFee": 8000000,
+        "note": "note",
+        "address": "Address line",
+        "insured": true
+      }
+    },
+    {
+      "case": "bare",
+      "payload": {
+        "id": "r-players",
+        "fullName": "Sample Player",
+        "phone": "09123456789",
+        "teamId": "t-fixture-1",
+        "position": "setter",
+        "jersey": 7,
+        "birthDate": "2025-03-21",
+        "heightCm": 188,
+        "status": "active",
+        "joinedAt": "2025-03-21",
+        "monthlyFee": 8000000
+      }
+    }
+  ],
+  "events": [
+    {
+      "case": "full",
+      "payload": {
+        "id": "r-events",
+        "type": "training",
+        "teamId": "t-fixture-1",
+        "title": "Sample title",
+        "opponent": "Opponent",
+        "location": "Hall 1",
+        "startsAt": "2026-01-15T09:30:00.000Z",
+        "durationMin": 90,
+        "status": "scheduled",
+        "notes": "notes",
+        "reminderNote": "reminder",
+        "sets": [
+          {
+            "home": 25,
+            "away": 21
+          }
+        ]
+      }
+    },
+    {
+      "case": "bare",
+      "payload": {
+        "id": "r-events",
+        "type": "training",
+        "teamId": "t-fixture-1",
+        "title": "Sample title",
+        "location": "Hall 1",
+        "startsAt": "2026-01-15T09:30:00.000Z",
+        "durationMin": 90,
+        "status": "scheduled"
+      }
+    }
+  ],
+  "attendance": [
+    {
+      "case": "full",
+      "payload": {
+        "id": "r-attendance",
+        "eventId": "e-fixture-1",
+        "playerId": "p-fixture-1",
+        "status": "present"
+      }
+    },
+    {
+      "case": "bare",
+      "payload": {
+        "id": "r-attendance",
+        "eventId": "e-fixture-1",
+        "playerId": "p-fixture-1",
+        "status": "present"
+      }
+    }
+  ],
+  "stats": [
+    {
+      "case": "full",
+      "payload": {
+        "id": "r-stats",
+        "eventId": "e-fixture-1",
+        "playerId": "p-fixture-1",
+        "servePoints": 21,
+        "attackPoints": 14,
+        "blockPoints": 3,
+        "digs": 11,
+        "errors": 5
+      }
+    },
+    {
+      "case": "bare",
+      "payload": {
+        "id": "r-stats",
+        "eventId": "e-fixture-1",
+        "playerId": "p-fixture-1",
+        "servePoints": 21,
+        "attackPoints": 14,
+        "blockPoints": 3,
+        "digs": 11,
+        "errors": 5
+      }
+    }
+  ],
+  "invoices": [
+    {
+      "case": "full",
+      "payload": {
+        "id": "r-invoices",
+        "playerId": "p-fixture-1",
+        "kind": "tuition",
+        "period": "1404/07",
+        "title": "Sample title",
+        "amount": 45000000,
+        "dueAt": "2026-01-15T09:30:00.000Z",
+        "issuedAt": "2026-01-15T09:30:00.000Z"
+      }
+    },
+    {
+      "case": "bare",
+      "payload": {
+        "id": "r-invoices",
+        "playerId": "p-fixture-1",
+        "kind": "tuition",
+        "period": "1404/07",
+        "title": "Sample title",
+        "amount": 45000000,
+        "dueAt": "2026-01-15T09:30:00.000Z",
+        "issuedAt": "2026-01-15T09:30:00.000Z"
+      }
+    }
+  ],
+  "payments": [
+    {
+      "case": "full",
+      "payload": {
+        "id": "r-payments",
+        "invoiceId": "i-fixture-1",
+        "playerId": "p-fixture-1",
+        "amount": 45000000,
+        "paidAt": "2026-01-15T09:30:00.000Z",
+        "method": "card",
+        "accountId": "acc-fixture-1",
+        "reference": "REF-1"
+      }
+    },
+    {
+      "case": "bare",
+      "payload": {
+        "id": "r-payments",
+        "invoiceId": "i-fixture-1",
+        "playerId": "p-fixture-1",
+        "amount": 45000000,
+        "paidAt": "2026-01-15T09:30:00.000Z",
+        "method": "card"
+      }
+    }
+  ],
+  "categories": [
+    {
+      "case": "full",
+      "payload": {
+        "id": "r-categories",
+        "name": "Sample",
+        "kind": "income",
+        "system": true
+      }
+    },
+    {
+      "case": "bare",
+      "payload": {
+        "id": "r-categories",
+        "name": "Sample",
+        "kind": "income"
+      }
+    }
+  ],
+  "accounts": [
+    {
+      "case": "full",
+      "payload": {
+        "id": "r-accounts",
+        "name": "Sample",
+        "kind": "cash",
+        "bankName": "Bank",
+        "accountNumber": "1234567890",
+        "cardNumber": "6037700000000000",
+        "iban": "IR0000000000000000000000",
+        "openingBalance": 120000000,
+        "active": true
+      }
+    },
+    {
+      "case": "bare",
+      "payload": {
+        "id": "r-accounts",
+        "name": "Sample",
+        "kind": "cash",
+        "openingBalance": 120000000,
+        "active": true
+      }
+    }
+  ],
+  "transactions": [
+    {
+      "case": "full",
+      "payload": {
+        "id": "r-transactions",
+        "kind": "income",
+        "categoryId": "cat-fixture-1",
+        "accountId": "acc-fixture-1",
+        "amount": 45000000,
+        "method": "cash",
+        "date": "2025-03-21",
+        "title": "Sample title",
+        "party": "Party",
+        "playerId": "p-fixture-1",
+        "source": "manual",
+        "refId": "l-fixture-1",
+        "cheque": {
+          "number": "11/2233",
+          "bank": "Bank",
+          "dueAt": "2026-01-15T09:30:00.000Z",
+          "status": "pending"
+        },
+        "note": "note",
+        "credit": true,
+        "settled": true,
+        "settledAt": "2026-01-15T09:30:00.000Z",
+        "createdAt": "2026-01-15T09:30:00.000Z"
+      }
+    },
+    {
+      "case": "bare",
+      "payload": {
+        "id": "r-transactions",
+        "kind": "income",
+        "categoryId": "cat-fixture-1",
+        "accountId": "acc-fixture-1",
+        "amount": 45000000,
+        "method": "cash",
+        "date": "2025-03-21",
+        "title": "Sample title",
+        "source": "manual",
+        "createdAt": "2026-01-15T09:30:00.000Z"
+      }
+    }
+  ],
+  "products": [
+    {
+      "case": "full",
+      "payload": {
+        "id": "r-products",
+        "name": "Sample",
+        "category": "clothing",
+        "sku": "SKU-1",
+        "size": "M",
+        "costPrice": 90000000,
+        "salePrice": 140000000,
+        "stock": 12,
+        "minStock": 3,
+        "active": true
+      }
+    },
+    {
+      "case": "bare",
+      "payload": {
+        "id": "r-products",
+        "name": "Sample",
+        "category": "clothing",
+        "costPrice": 90000000,
+        "salePrice": 140000000,
+        "stock": 12,
+        "minStock": 3,
+        "active": true
+      }
+    }
+  ],
+  "stockMovements": [
+    {
+      "case": "full",
+      "payload": {
+        "id": "r-stockMovements",
+        "productId": "pr-fixture-1",
+        "kind": "purchase",
+        "qty": 4,
+        "unitPrice": 140000000,
+        "date": "2025-03-21",
+        "party": "Party",
+        "accountId": "acc-fixture-1",
+        "method": "cash",
+        "cheque": {
+          "number": "11/2233",
+          "bank": "Bank",
+          "dueAt": "2026-01-15T09:30:00.000Z",
+          "status": "pending"
+        },
+        "ledgerId": "l-fixture-1",
+        "note": "note"
+      }
+    },
+    {
+      "case": "bare",
+      "payload": {
+        "id": "r-stockMovements",
+        "productId": "pr-fixture-1",
+        "kind": "purchase",
+        "qty": 4,
+        "unitPrice": 140000000,
+        "date": "2025-03-21"
+      }
+    }
+  ]
+}

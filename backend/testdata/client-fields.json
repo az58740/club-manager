@@ -1,0 +1,677 @@
+{
+  "club": {
+    "interface": "ClubProfile",
+    "fields": [
+      {
+        "name": "name",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "shortName",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "sport",
+        "optional": false,
+        "type": "Sport"
+      },
+      {
+        "name": "city",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "founded",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "phone",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "season",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "logo",
+        "optional": true,
+        "type": "string"
+      }
+    ]
+  },
+  "teams": {
+    "interface": "Team",
+    "fields": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "name",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "ageGroup",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "coach",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "color",
+        "optional": false,
+        "type": "TeamColor"
+      },
+      {
+        "name": "season",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "homeVenue",
+        "optional": false,
+        "type": "string"
+      }
+    ]
+  },
+  "players": {
+    "interface": "Player",
+    "fields": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "fullName",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "phone",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "teamId",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "position",
+        "optional": false,
+        "type": "Position"
+      },
+      {
+        "name": "jersey",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "birthDate",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "heightCm",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "status",
+        "optional": false,
+        "type": "PlayerStatus"
+      },
+      {
+        "name": "joinedAt",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "monthlyFee",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "note",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "address",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "insured",
+        "optional": true,
+        "type": "boolean"
+      }
+    ]
+  },
+  "events": {
+    "interface": "ClubEvent",
+    "fields": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "type",
+        "optional": false,
+        "type": "EventType"
+      },
+      {
+        "name": "teamId",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "title",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "opponent",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "location",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "startsAt",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "durationMin",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "status",
+        "optional": false,
+        "type": "EventStatus"
+      },
+      {
+        "name": "notes",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "reminderNote",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "sets",
+        "optional": true,
+        "type": "SetScore[]"
+      }
+    ]
+  },
+  "attendance": {
+    "interface": "Attendance",
+    "fields": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "eventId",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "playerId",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "status",
+        "optional": false,
+        "type": "AttendanceStatus"
+      }
+    ]
+  },
+  "stats": {
+    "interface": "MatchStat",
+    "fields": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "eventId",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "playerId",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "servePoints",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "attackPoints",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "blockPoints",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "digs",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "errors",
+        "optional": false,
+        "type": "number"
+      }
+    ]
+  },
+  "invoices": {
+    "interface": "Invoice",
+    "fields": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "playerId",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "kind",
+        "optional": false,
+        "type": "InvoiceKind"
+      },
+      {
+        "name": "period",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "title",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "amount",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "dueAt",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "issuedAt",
+        "optional": false,
+        "type": "string"
+      }
+    ]
+  },
+  "payments": {
+    "interface": "Payment",
+    "fields": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "invoiceId",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "playerId",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "amount",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "paidAt",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "method",
+        "optional": false,
+        "type": "PaymentMethod"
+      },
+      {
+        "name": "accountId",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "reference",
+        "optional": true,
+        "type": "string"
+      }
+    ]
+  },
+  "categories": {
+    "interface": "FinanceCategory",
+    "fields": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "name",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "kind",
+        "optional": false,
+        "type": "TransactionKind"
+      },
+      {
+        "name": "system",
+        "optional": true,
+        "type": "boolean"
+      }
+    ]
+  },
+  "accounts": {
+    "interface": "BankAccount",
+    "fields": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "name",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "kind",
+        "optional": false,
+        "type": "AccountKind"
+      },
+      {
+        "name": "bankName",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "accountNumber",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "cardNumber",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "iban",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "openingBalance",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "active",
+        "optional": false,
+        "type": "boolean"
+      }
+    ]
+  },
+  "transactions": {
+    "interface": "LedgerEntry",
+    "fields": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "kind",
+        "optional": false,
+        "type": "TransactionKind"
+      },
+      {
+        "name": "categoryId",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "accountId",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "amount",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "method",
+        "optional": false,
+        "type": "LedgerMethod"
+      },
+      {
+        "name": "date",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "title",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "party",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "playerId",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "source",
+        "optional": false,
+        "type": "TransactionSource"
+      },
+      {
+        "name": "refId",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "cheque",
+        "optional": true,
+        "type": "ChequeInfo"
+      },
+      {
+        "name": "note",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "credit",
+        "optional": true,
+        "type": "boolean"
+      },
+      {
+        "name": "settled",
+        "optional": true,
+        "type": "boolean"
+      },
+      {
+        "name": "settledAt",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "createdAt",
+        "optional": false,
+        "type": "string"
+      }
+    ]
+  },
+  "products": {
+    "interface": "Product",
+    "fields": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "name",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "category",
+        "optional": false,
+        "type": "ProductCategory"
+      },
+      {
+        "name": "sku",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "size",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "costPrice",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "salePrice",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "stock",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "minStock",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "active",
+        "optional": false,
+        "type": "boolean"
+      }
+    ]
+  },
+  "stockMovements": {
+    "interface": "StockMovement",
+    "fields": [
+      {
+        "name": "id",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "productId",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "kind",
+        "optional": false,
+        "type": "StockMovementKind"
+      },
+      {
+        "name": "qty",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "unitPrice",
+        "optional": false,
+        "type": "number"
+      },
+      {
+        "name": "date",
+        "optional": false,
+        "type": "string"
+      },
+      {
+        "name": "party",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "accountId",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "method",
+        "optional": true,
+        "type": "LedgerMethod"
+      },
+      {
+        "name": "cheque",
+        "optional": true,
+        "type": "ChequeInfo"
+      },
+      {
+        "name": "ledgerId",
+        "optional": true,
+        "type": "string"
+      },
+      {
+        "name": "note",
+        "optional": true,
+        "type": "string"
+      }
+    ]
+  }
+}
