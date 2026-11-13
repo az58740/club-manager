@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import {
   ArrowLeft,
   CalendarDays,
@@ -17,9 +18,11 @@ import {
   Wallet,
 } from "lucide-react";
 import { useClub } from "@/lib/store";
+import { allLedgerEntries, entriesInMonth, ledgerTotals } from "@/lib/finance";
 import {
   activePlayers,
   attendanceBreakdown,
+  debtorBreakdown,
   eventAttendance,
   invoicePaidAmount,
   playerAttendance,
@@ -31,16 +34,28 @@ import {
   totalOutstanding,
   upcomingEvents,
 } from "@/lib/selectors";
-import { formatDay, formatMonthYear, formatTime, localDigits, shortDayNumber, shortMonthName, timeUntil } from "@/lib/date";
+import { addJalaliMonths, formatDay, formatMonthYear, formatTime, localDigits, shortDayNumber, shortMonthName, timeUntil } from "@/lib/date";
 import { compactToman, faNum, percent, toman } from "@/lib/format";
 import { EVENT_TYPE_LABELS, ROLE_LABELS, STAT_LABELS, TEAM_THEME } from "@/lib/labels";
 import { M, useT } from "@/lib/i18n/messages";
-import { Avatar, Badge, Card, ClubLogo, Progress, buttonStyles, cn } from "@/components/ui";
+import { Avatar, Badge, Card, ClubLogo, Progress, Select, buttonStyles, cn } from "@/components/ui";
 
 export default function DashboardPage() {
   const { data, currentUser, role, isManager, isPlayer } = useClub();
   const t = useT();
+  const [reportMonthOffset, setReportMonthOffset] = useState(0);
   const now = new Date();
+  const reportMonths = Array.from({ length: 12 }, (_, index) => {
+    const offset = -index;
+    const start = addJalaliMonths(now, offset);
+    return { offset, start, label: formatMonthYear(start) };
+  });
+  const reportMonth = addJalaliMonths(now, reportMonthOffset);
+  const reportTotals = useMemo(() => {
+    const entries = entriesInMonth(allLedgerEntries(data), reportMonth);
+    return ledgerTotals(entries);
+  }, [data, reportMonth]);
+  const debtors = useMemo(() => debtorBreakdown(data), [data]);
   const statLabels = STAT_LABELS[data.club.sport];
 
   const me = currentUser?.playerId ? playerById(data, currentUser.playerId) : undefined;
@@ -71,7 +86,7 @@ export default function DashboardPage() {
   );
   const collectRate = periodTotal ? (periodPaid / periodTotal) * 100 : 0;
   const outstanding = totalOutstanding(data);
-  const debtors = data.players.filter((player) => playerDebt(player.id, data) > 0).length;
+  const debtorCount = debtors.length;
   const myDebt = me ? playerDebt(me.id, data) : 0;
   const myStats = me ? playerStats(data, me.id) : null;
   const myAttendance = me ? playerAttendance(data, me.id) : null;
@@ -285,7 +300,7 @@ export default function DashboardPage() {
                   label={t(M.dashboard.outstanding)}
                   value={compactToman(outstanding)}
                   unit={t(M.common.tomanUnit)}
-                  hint={t(M.dashboard.debtorsCount, { count: faNum(debtors) })}
+                  hint={t(M.dashboard.debtorsCount, { count: faNum(debtorCount) })}
                   icon={<Wallet className="h-4 w-4" />}
                   tone={outstanding ? "amber" : "emerald"}
                 />
@@ -523,7 +538,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="rounded-xl bg-slate-50 px-3 py-2">
                     <p className="text-muted">{t(M.dashboard.debtors)}</p>
-                    <p className="mt-1 font-bold text-ink">{t(M.dashboard.playersCount, { count: faNum(debtors) })}</p>
+                  <p className="mt-1 font-bold text-ink">{t(M.dashboard.playersCount, { count: faNum(debtorCount) })}</p>
                   </div>
                 </div>
                 <Link
@@ -539,6 +554,87 @@ export default function DashboardPage() {
           ) : null}
         </div>
       </div>
+
+      {isManager ? (
+        <section className="grid gap-4 lg:grid-cols-2 lg:gap-5" aria-label={t(M.dashboard.managerReports)}>
+          <Card className="p-5">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="text-[15px] font-bold text-ink">{t(M.dashboard.monthlyReport)}</h2>
+                <p className="mt-0.5 text-[11px] text-muted">{t(M.dashboard.monthlyReportHint)}</p>
+              </div>
+              <label className="w-40">
+                <span className="sr-only">{t(M.dashboard.reportMonth)}</span>
+                <Select
+                  value={String(reportMonthOffset)}
+                  onChange={(event) => setReportMonthOffset(Number(event.target.value))}
+                  aria-label={t(M.dashboard.reportMonth)}
+                >
+                  {reportMonths.map((month) => (
+                    <option key={month.offset} value={month.offset}>{month.label}</option>
+                  ))}
+                </Select>
+              </label>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              <div className="rounded-2xl bg-emerald-50 p-3">
+                <p className="text-[10px] text-emerald-700">{t(M.dashboard.monthIncome)}</p>
+                <p className="mt-1 break-words text-[13px] font-extrabold text-emerald-800">{compactToman(reportTotals.income)}</p>
+              </div>
+              <div className="rounded-2xl bg-rose-50 p-3">
+                <p className="text-[10px] text-rose-700">{t(M.dashboard.monthExpenses)}</p>
+                <p className="mt-1 break-words text-[13px] font-extrabold text-rose-800">{compactToman(reportTotals.expense)}</p>
+              </div>
+              <div className="rounded-2xl bg-brand-50 p-3">
+                <p className="text-[10px] text-brand-700">{t(M.dashboard.monthNet)}</p>
+                <p className="mt-1 break-words text-[13px] font-extrabold text-brand-800">{compactToman(reportTotals.net)}</p>
+              </div>
+            </div>
+            <p className="mt-3 text-[10px] leading-5 text-muted">{t(M.dashboard.monthlyReportLedgerBasis)}</p>
+            <Link href="/finances/ledger" className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-brand-600">
+              {t(M.dashboard.openLedger)} <ChevronLeft className="h-3.5 w-3.5 ltr:rotate-180" />
+            </Link>
+          </Card>
+
+          <Card className="overflow-hidden">
+            <div className="flex items-center justify-between gap-2 px-5 pt-5">
+              <div>
+                <h2 className="text-[15px] font-bold text-ink">{t(M.dashboard.debtorsList)}</h2>
+                <p className="mt-0.5 text-[11px] text-muted">{t(M.dashboard.debtorsListHint, { count: faNum(debtorCount) })}</p>
+              </div>
+              <Badge tone={debtorCount ? "rose" : "emerald"}>{faNum(debtorCount)}</Badge>
+            </div>
+            <div className="mt-3 max-h-[26rem] divide-y divide-line/70 overflow-y-auto">
+              {debtors.map(({ player, tuition, shop, total }) => (
+                <Link
+                  key={player.id}
+                  href={`/players?id=${player.id}`}
+                  className="flex items-center gap-2.5 px-4 py-3 transition hover:bg-slate-50/70 sm:px-5"
+                >
+                  <Avatar name={player.fullName} size="sm" ring={false} />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[12px] font-semibold text-ink">{player.fullName}</p>
+                    <p className="truncate text-[10px] text-muted">
+                      {data.teams.find((team) => team.id === player.teamId)?.name ?? t(M.finance.noTeam)}
+                      {tuition > 0 ? ` · ${t(M.finance.tuitionWord)} ${compactToman(tuition)}` : ""}
+                      {shop > 0 ? ` · ${t(M.finance.shopWord)} ${compactToman(shop)}` : ""}
+                    </p>
+                  </div>
+                  <p className="shrink-0 text-[11px] font-bold text-rose-600">{toman(total)}</p>
+                </Link>
+              ))}
+              {!debtorCount ? (
+                <p className="px-5 py-8 text-center text-[11px] text-muted">{t(M.dashboard.noDebtors)}</p>
+              ) : null}
+            </div>
+            {debtorCount ? (
+              <Link href="/finances" className="flex items-center justify-center gap-1 border-t border-line px-4 py-3 text-[11px] font-medium text-brand-600">
+                {t(M.dashboard.openDebtorReport)} <ChevronLeft className="h-3.5 w-3.5 ltr:rotate-180" />
+              </Link>
+            ) : null}
+          </Card>
+        </section>
+      ) : null}
 
       <div className="flex items-center justify-between rounded-2xl bg-white/60 px-4 py-3 text-[10px] text-muted ring-1 ring-line/60 sm:hidden">
         <span className="flex items-center gap-1.5">
@@ -597,4 +693,3 @@ function KpiCard({
     </Card>
   );
 }
-
