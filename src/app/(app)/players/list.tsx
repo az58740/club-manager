@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, Plus, SearchX, ShieldCheck, ShieldOff, UserRound, Users } from "lucide-react";
+import { ChevronLeft, Pencil, Plus, SearchX, ShieldCheck, ShieldOff, UserRound, Users } from "lucide-react";
 import { useClub } from "@/lib/store";
-import type { PlayerStatus } from "@/lib/types";
+import type { Player, PlayerStatus } from "@/lib/types";
 import { PLAYER_STATUS_LABELS, POSITION_LABELS, TEAM_THEME } from "@/lib/labels";
 import { playerTotalDebt } from "@/lib/selectors";
 import { compactToman, faNum } from "@/lib/format";
@@ -45,6 +44,7 @@ export default function PlayersPage() {
   const [status, setStatus] = useState<"all" | PlayerStatus>("all");
   const [teamFilter, setTeamFilter] = useState("all");
   const [formOpen, setFormOpen] = useState(false);
+  const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
 
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get("new") === "1") {
@@ -145,68 +145,82 @@ export default function PlayersPage() {
             const team = data.teams.find((row) => row.id === player.teamId);
             const debt = playerTotalDebt(player.id, data);
             return (
-              <Link
-                key={player.id}
-                href={`/players?id=${player.id}`}
-                className="flex items-center gap-3 px-3.5 py-3 transition hover:bg-slate-50/70 sm:px-5"
-              >
-                <div className="relative">
-                  <Avatar name={player.fullName} size="md" ring={false} />
-                  <span className="absolute -bottom-1 -end-1 grid h-5 min-w-5 place-items-center rounded-full bg-white px-1 text-[9px] font-bold text-ink-soft ring-1 ring-line">
-                    {faNum(player.jersey)}
-                  </span>
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="truncate text-[13px] font-semibold text-ink">
-                      {player.fullName}
-                    </p>
-                    {player.status !== "active" ? (
-                      <Badge tone={statusTone[player.status]}>
-                        {PLAYER_STATUS_LABELS[player.status]}
-                      </Badge>
-                    ) : null}
+              <div key={player.id} className="flex items-center gap-1 px-2 py-2 sm:px-3">
+                <a
+                  href={`/players/?id=${encodeURIComponent(player.id)}`}
+                  className="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-1.5 py-1 transition hover:bg-slate-50/70"
+                >
+                  <div className="relative">
+                    <Avatar name={player.fullName} size="md" ring={false} />
+                    <span className="absolute -bottom-1 -end-1 grid h-5 min-w-5 place-items-center rounded-full bg-white px-1 text-[9px] font-bold text-ink-soft ring-1 ring-line">
+                      {faNum(player.jersey)}
+                    </span>
                   </div>
-                  <p className="mt-0.5 truncate text-[11px] text-muted">
-                    {POSITION_LABELS[player.position]}
-                    {team ? ` · ${team.name}` : ""}
-                  </p>
-                  <p
-                    className={cn(
-                      "mt-0.5 flex items-center gap-1 text-[10px] font-medium",
-                      player.insured ? "text-emerald-600" : "text-rose-500",
-                    )}
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="truncate text-[13px] font-semibold text-ink">
+                        {player.fullName}
+                      </p>
+                      {player.status !== "active" ? (
+                        <Badge tone={statusTone[player.status]}>
+                          {PLAYER_STATUS_LABELS[player.status]}
+                        </Badge>
+                      ) : null}
+                    </div>
+                    <p className="mt-0.5 truncate text-[11px] text-muted">
+                      {POSITION_LABELS[player.position]}
+                      {team ? ` · ${team.name}` : ""}
+                    </p>
+                    <p
+                      className={cn(
+                        "mt-0.5 flex items-center gap-1 text-[10px] font-medium",
+                        player.insured ? "text-emerald-600" : "text-rose-500",
+                      )}
+                    >
+                      {player.insured ? (
+                        <ShieldCheck className="h-3 w-3 shrink-0" />
+                      ) : (
+                        <ShieldOff className="h-3 w-3 shrink-0" />
+                      )}
+                      {t(player.insured ? M.players.insured : M.players.notInsured)}
+                    </p>
+                  </div>
+
+                  {debt > 0 ? (
+                    <span className="hidden rounded-lg bg-rose-50 px-2 py-1 text-[10px] font-medium text-rose-600 ring-1 ring-rose-100 sm:inline-flex">
+                      {t(M.players.debt, { amount: compactToman(debt) })}
+                    </span>
+                  ) : canEdit ? (
+                    <span className="hidden rounded-lg bg-emerald-50 px-2 py-1 text-[10px] font-medium text-emerald-600 ring-1 ring-emerald-100 sm:inline-flex">
+                      {t(M.players.settledChip)}
+                    </span>
+                  ) : null}
+
+                  {team ? (
+                    <span
+                      className={cn(
+                        "hidden h-2 w-2 rounded-full lg:block",
+                        TEAM_THEME[team.color].dot,
+                      )}
+                    />
+                  ) : null}
+                  <ChevronLeft className="h-4 w-4 shrink-0 text-muted/60 ltr:rotate-180" />
+                </a>
+                {canEdit ? (
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    className="shrink-0"
+                    aria-label={`${t(M.form.edit)} ${player.fullName}`}
+                    title={t(M.form.edit)}
+                    onClick={() => setEditingPlayer(player)}
                   >
-                    {player.insured ? (
-                      <ShieldCheck className="h-3 w-3 shrink-0" />
-                    ) : (
-                      <ShieldOff className="h-3 w-3 shrink-0" />
-                    )}
-                    {t(player.insured ? M.players.insured : M.players.notInsured)}
-                  </p>
-                </div>
-
-                {debt > 0 ? (
-                  <span className="hidden rounded-lg bg-rose-50 px-2 py-1 text-[10px] font-medium text-rose-600 ring-1 ring-rose-100 sm:inline-flex">
-                    {t(M.players.debt, { amount: compactToman(debt) })}
-                  </span>
-                ) : canEdit ? (
-                  <span className="hidden rounded-lg bg-emerald-50 px-2 py-1 text-[10px] font-medium text-emerald-600 ring-1 ring-emerald-100 sm:inline-flex">
-                    {t(M.players.settledChip)}
-                  </span>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
                 ) : null}
-
-                {team ? (
-                  <span
-                    className={cn(
-                      "hidden h-2 w-2 rounded-full lg:block",
-                      TEAM_THEME[team.color].dot,
-                    )}
-                  />
-                ) : null}
-                <ChevronLeft className="h-4 w-4 shrink-0 text-muted/60 ltr:rotate-180" />
-              </Link>
+              </div>
             );
           })}
         </Card>
@@ -229,7 +243,15 @@ export default function PlayersPage() {
       )}
 
       {canEdit ? (
-        <PlayerFormSheet open={formOpen} onClose={() => setFormOpen(false)} defaultTeamId={undefined} />
+        <PlayerFormSheet
+          open={formOpen || editingPlayer !== null}
+          player={editingPlayer}
+          onClose={() => {
+            setFormOpen(false);
+            setEditingPlayer(null);
+          }}
+          defaultTeamId={undefined}
+        />
       ) : null}
     </div>
   );
