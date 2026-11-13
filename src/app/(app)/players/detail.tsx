@@ -43,6 +43,7 @@ import { Avatar, Badge, Button, Card, EmptyState, Progress, Segmented, cn } from
 import { PlayerFormSheet } from "@/components/player-form";
 import { PaymentSheet } from "@/components/payment-sheet";
 import { TuitionReceiptSheet } from "@/components/tuition-receipt-sheet";
+import { OpeningDebtSheet } from "@/components/opening-debt-sheet";
 
 type Tab = "stats" | "attendance" | "finance";
 
@@ -73,6 +74,7 @@ export default function PlayerProfilePage({ recordId }: { recordId: string }) {
   const [editOpen, setEditOpen] = useState(false);
   const [paymentInvoiceId, setPaymentInvoiceId] = useState<string | null>(null);
   const [tuitionReceiptOpen, setTuitionReceiptOpen] = useState(false);
+  const [openingDebtOpen, setOpeningDebtOpen] = useState(false);
 
   useEffect(() => {
     if (isPlayer && currentUser?.playerId && id && id !== currentUser.playerId) {
@@ -124,6 +126,8 @@ export default function PlayerProfilePage({ recordId }: { recordId: string }) {
   const invoices = data.invoices
     .filter((invoice) => invoice.playerId === player.id)
     .sort((a, b) => +new Date(b.dueAt) - +new Date(a.dueAt));
+  const openingDebtInvoice = invoices.find((invoice) => invoice.kind === "opening_balance") ?? null;
+  const openingDebtPaid = openingDebtInvoice ? invoicePaidAmount(openingDebtInvoice, data) : 0;
 
   return (
     <div className="space-y-4 sm:space-y-5">
@@ -371,10 +375,24 @@ export default function PlayerProfilePage({ recordId }: { recordId: string }) {
       {tab === "finance" && canSeeFinance ? (
         <div className="space-y-3">
           {canPay ? (
-            <Button className="w-full" onClick={() => setTuitionReceiptOpen(true)}>
-              <ReceiptText className="h-4 w-4" />
-              {t(M.payment.receiveTuition)}
-            </Button>
+            <div className="space-y-2">
+              <Button className="w-full" onClick={() => setTuitionReceiptOpen(true)}>
+                <ReceiptText className="h-4 w-4" />
+                {t(M.payment.receiveTuition)}
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => setOpeningDebtOpen(true)}
+                disabled={openingDebtPaid > 0}
+              >
+                <Wallet className="h-4 w-4" />
+                {t(openingDebtInvoice ? M.openingDebt.editButton : M.openingDebt.button)}
+              </Button>
+              {openingDebtPaid > 0 ? (
+                <p className="px-1 text-[10px] leading-5 text-muted">{t(M.openingDebt.locked)}</p>
+              ) : null}
+            </div>
           ) : null}
           {invoices.length ? (
             <div className="space-y-2.5">
@@ -392,6 +410,9 @@ export default function PlayerProfilePage({ recordId }: { recordId: string }) {
                         <p className="mt-0.5 text-[10px] text-muted">
                           {t(M.players.dueOn, { date: formatDateFull(invoice.dueAt) })}
                         </p>
+                        {invoice.note ? (
+                          <p className="mt-0.5 text-[10px] text-muted">{invoice.note}</p>
+                        ) : null}
                         {invoice.subtotal !== undefined || discount > 0 ? (
                           <div className="mt-1 space-y-0.5 text-[10px] text-muted">
                             <p>
@@ -466,6 +487,14 @@ export default function PlayerProfilePage({ recordId }: { recordId: string }) {
           player={player}
           open={tuitionReceiptOpen}
           onClose={() => setTuitionReceiptOpen(false)}
+        />
+      ) : null}
+      {canPay ? (
+        <OpeningDebtSheet
+          player={player}
+          invoice={openingDebtInvoice}
+          open={openingDebtOpen}
+          onClose={() => setOpeningDebtOpen(false)}
         />
       ) : null}
     </div>

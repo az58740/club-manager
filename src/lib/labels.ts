@@ -228,6 +228,7 @@ export const USER_STATUS_LABELS: Record<UserStatus, string> = bilingual({
 export const INVOICE_KIND_LABELS: Record<InvoiceKind, string> = bilingual({
   tuition: bi("شهریه", "Tuition"),
   tax: bi("مالیات", "Tax"),
+  opening_balance: bi("بدهی قبلی", "Opening balance"),
 });
 
 export const ROLE_LABELS: Record<Role, string> = bilingual({

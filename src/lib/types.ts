@@ -98,7 +98,7 @@ export interface MatchStat {
   errors: number;
 }
 
-export type InvoiceKind = "tuition" | "tax";
+export type InvoiceKind = "tuition" | "tax" | "opening_balance";
 
 export interface Invoice {
   id: string;
@@ -110,6 +110,8 @@ export interface Invoice {
   subtotal?: number;
   /** Discount applied to the invoice; absent on older invoices. */
   discountAmount?: number;
+  /** Optional explanation, especially for a brought-forward opening balance. */
+  note?: string;
   amount: number;
   dueAt: string;
   issuedAt: string;
