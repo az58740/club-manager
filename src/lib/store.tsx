@@ -54,6 +54,11 @@ import { useRecordSync } from "./use-record-sync";
 import { useLocale } from "./i18n/locale";
 import { M, tr } from "./i18n/messages";
 import {
+  getLocalItemMigrating,
+  requestPersistentStorage,
+  setLocalItemWithFallback,
+} from "./offline-storage";
+import {
   emailTaken,
   findUserByEmail,
   normalizeEmail,
@@ -253,11 +258,11 @@ export function ClubProvider({ children }: { children: ReactNode }) {
    * the manager must not keep reading rows the server never sent them, and the
    * manager must not lose their place when someone else uses the same device.
    */
-  const adoptCloudUser = useCallback((profile: AppUser) => {
+  const adoptCloudUser = useCallback(async (profile: AppUser) => {
     const fallback = createEmptyData();
     let next = fallback;
     try {
-      const raw = localStorage.getItem(`${DATA_KEY}:${profile.id}`);
+      const raw = await getLocalItemMigrating(`${DATA_KEY}:${profile.id}`);
       const parsed = raw ? (JSON.parse(raw) as ClubData) : null;
       if (parsed && typeof parsed === "object") next = normalizeData(parsed, fallback);
     } catch {
@@ -277,23 +282,35 @@ export function ClubProvider({ children }: { children: ReactNode }) {
     // the sample data, so a real device cannot inherit demo accounts or balances.
     const fallback = createEmptyData();
     let next: ClubData = fallback;
-    if (authMode === "demo") {
-      try {
-        const raw = localStorage.getItem(DATA_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw) as ClubData;
-          if (parsed && typeof parsed === "object") next = normalizeData(parsed, fallback);
+    let cancelled = false;
+    void (async () => {
+      if (authMode === "demo") {
+        try {
+          const raw = await getLocalItemMigrating(DATA_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw) as ClubData;
+            if (parsed && typeof parsed === "object") next = normalizeData(parsed, fallback);
+          }
+          const session = localStorage.getItem(SESSION_KEY);
+          if (session && next.users.some((user) => user.id === session)) setSessionUserId(session);
+          else if (session) localStorage.removeItem(SESSION_KEY);
+        } catch {
+          // Continue with an empty club if local storage needs recovery.
         }
-        const session = localStorage.getItem(SESSION_KEY);
-        if (session && next.users.some((user) => user.id === session)) setSessionUserId(session);
-        else if (session) localStorage.removeItem(SESSION_KEY);
-      } catch {
-        localStorage.removeItem(DATA_KEY);
       }
-    }
-    setData(next);
-    setDataReady(true);
+      if (!cancelled) {
+        setData(next);
+        setDataReady(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [authMode]);
+
+  useEffect(() => {
+    if (dataReady) void requestPersistentStorage();
+  }, [dataReady]);
 
   useEffect(() => {
     if (!dataReady) return;
@@ -354,7 +371,7 @@ export function ClubProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!dataReady || !mirrorKey) return;
     try {
-      localStorage.setItem(mirrorKey, JSON.stringify(data));
+      void setLocalItemWithFallback(mirrorKey, JSON.stringify(data)).catch(() => undefined);
     } catch {
       // storage can be unavailable in private mode; the app still works in memory
     }
@@ -920,11 +937,7 @@ export function ClubProvider({ children }: { children: ReactNode }) {
 
   const resetDemo = useCallback(() => {
     const seed = createSeedData();
-    try {
-      localStorage.setItem(DATA_KEY, JSON.stringify(seed));
-    } catch {
-      // ignore storage failures; in-memory state is still reset
-    }
+    void setLocalItemWithFallback(DATA_KEY, JSON.stringify(seed)).catch(() => undefined);
     if (authMode === "demo") {
       clearLocalCredentials();
       void ensureLocalCredentials(seed.users);
@@ -1060,6 +1073,11 @@ export function ClubProvider({ children }: { children: ReactNode }) {
         await setLocalPassword(manager.id, input.password);
       } catch {
         return { ok: false, reason: "error", message: tr(M.store.restorePasswordFailed) };
+      }
+      try {
+        await setLocalItemWithFallback(DATA_KEY, JSON.stringify(next));
+      } catch {
+        return { ok: false, reason: "error", message: tr(M.store.restoreSaveFailed) };
       }
       // The file defines the account set, so hashes left over from accounts it does not
       // contain are dropped instead of piling up on the device.

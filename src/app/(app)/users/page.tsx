@@ -327,7 +327,7 @@ export default function UsersPage() {
                       {user.role === "player" ? (
                         <Badge tone={linked ? "emerald" : "amber"}>
                           {linked
-                            ? t(M.users.linkedPlayerChip, { name: linked.name })
+                            ? t(M.users.linkedPlayerChip, { name: linked.fullName })
                             : t(M.users.notLinkedChip)}
                         </Badge>
                       ) : null}
@@ -465,7 +465,7 @@ export default function UsersPage() {
             <option value="">{t(M.memberForm.noPlayer)}</option>
             {data.players.map((player) => (
               <option key={player.id} value={player.id}>
-                {player.name}
+                {player.fullName}
               </option>
             ))}
           </Select>

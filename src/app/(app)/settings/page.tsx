@@ -48,6 +48,7 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 import { ClubProfileSheet } from "@/components/club-profile-sheet";
 import { PasswordSheet } from "@/components/password-sheet";
 import { RestoreSheet } from "@/components/restore-sheet";
+import { BackupSheet } from "@/components/backup-sheet";
 import { EmzaSettingsCard } from "@/components/emza-settings";
 import { LocaleSwitch } from "@/components/locale-switch";
 import { M, type Message, useT } from "@/lib/i18n/messages";
@@ -86,6 +87,7 @@ export default function SettingsPage() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [restoreOpen, setRestoreOpen] = useState(false);
+  const [backupOpen, setBackupOpen] = useState(false);
   const [joinCode, setJoinCode] = useState("");
   const [syncBusy, setSyncBusy] = useState<"join" | "rotate" | "sync" | null>(null);
 
@@ -94,18 +96,6 @@ export default function SettingsPage() {
   const team = currentUser.teamId
     ? data.teams.find((row) => row.id === currentUser.teamId)
     : undefined;
-
-  const downloadBackup = () => {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    const fileName = data.club.shortName.trim().replace(/\s+/g, "-") || "club";
-    link.download = `${fileName}-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-    toast(t(M.settings.backupDownloaded), "info");
-  };
 
   const signOut = () => {
     logout();
@@ -341,7 +331,7 @@ export default function SettingsPage() {
           </p>
 
           <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            <Button variant="outline" size="sm" onClick={downloadBackup}>
+            <Button variant="outline" size="sm" onClick={() => setBackupOpen(true)}>
               <Download className="h-3.5 w-3.5" />
               {t(M.settings.downloadBackup)}
             </Button>
@@ -611,6 +601,7 @@ export default function SettingsPage() {
 
       <ClubProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
       <PasswordSheet open={passwordOpen} onClose={() => setPasswordOpen(false)} />
+      <BackupSheet open={backupOpen} onClose={() => setBackupOpen(false)} data={data} />
 
       {authMode === "demo" ? (
         <>

@@ -28,7 +28,10 @@ export default function ResetPasswordPage() {
     }
     setBusy(true);
     setNotice(null);
-    const result = await completePasswordReset(password);
+    const query = new URLSearchParams(window.location.search);
+    const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const token = query.get("token") ?? fragment.get("token") ?? "";
+    const result = await completePasswordReset(token, password);
     setBusy(false);
     setNotice({
       tone: result.ok ? "success" : "error",
@@ -47,13 +50,13 @@ export default function ResetPasswordPage() {
           <PageHeader
             title={t(M.resetPassword.title)}
             subtitle={
-              authMode === "supabase"
+              authMode === "cloud"
                 ? t(M.resetPassword.subtitleCloud)
                 : t(M.resetPassword.subtitleDemo)
             }
           />
 
-          {authMode !== "supabase" ? (
+          {authMode !== "cloud" ? (
             <div className="mt-5 space-y-4">
               <div className="flex items-start gap-2 rounded-xl bg-amber-50 px-3 py-3 text-[12px] leading-6 text-amber-800">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />

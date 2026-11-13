@@ -240,7 +240,7 @@ export function MemberForm({ open, onClose }: { open: boolean; onClose: () => vo
                 <option value="">{t(M.memberForm.noPlayer)}</option>
                 {data.players.map((player) => (
                   <option key={player.id} value={player.id}>
-                    {player.name}
+                    {player.fullName}
                   </option>
                 ))}
               </Select>
