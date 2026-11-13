@@ -16,12 +16,14 @@ import {
   EmptyState,
   PageHeader,
   SearchField,
+  Segmented,
   Select,
   cn,
 } from "@/components/ui";
 import { PlayerFormSheet } from "@/components/player-form";
 
 const statusFilters: Array<"all" | PlayerStatus> = ["all", "active", "injured", "inactive"];
+type DebtFilter = "all" | "debtor" | "settled";
 
 const statusTone: Record<PlayerStatus, "emerald" | "amber" | "slate"> = {
   active: "emerald",
@@ -42,6 +44,7 @@ export default function PlayersPage() {
   const t = useT();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"all" | PlayerStatus>("all");
+  const [debtFilter, setDebtFilter] = useState<DebtFilter>("all");
   const [teamFilter, setTeamFilter] = useState("all");
   const [formOpen, setFormOpen] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
@@ -62,6 +65,11 @@ export default function PlayersPage() {
       .filter((player) => (status === "all" ? true : player.status === status))
       .filter((player) => (teamFilter === "all" ? true : player.teamId === teamFilter))
       .filter((player) => {
+        if (!isManager || debtFilter === "all") return true;
+        const hasDebt = playerTotalDebt(player.id, data) > 0;
+        return debtFilter === "debtor" ? hasDebt : !hasDebt;
+      })
+      .filter((player) => {
         if (!needle) return true;
         const team = data.teams.find((row) => row.id === player.teamId);
         return [
@@ -79,9 +87,12 @@ export default function PlayersPage() {
         (a, b) =>
           (teamOrder.get(a.teamId) ?? 0) - (teamOrder.get(b.teamId) ?? 0) || a.jersey - b.jersey,
       );
-  }, [data.players, data.teams, query, status, teamFilter]);
+  }, [data, query, status, teamFilter, debtFilter, isManager]);
 
   const activeCount = data.players.filter((player) => player.status === "active").length;
+  const debtorCount = data.players.filter((player) => playerTotalDebt(player.id, data) > 0).length;
+  const settledCount = data.players.length - debtorCount;
+  const hasFilters = Boolean(query.trim()) || status !== "all" || teamFilter !== "all" || (isManager && debtFilter !== "all");
 
   return (
     <div className="space-y-4 sm:space-y-5">
@@ -137,6 +148,19 @@ export default function PlayersPage() {
             </Select>
           </div>
         </div>
+        {isManager ? (
+          <Segmented<DebtFilter>
+            value={debtFilter}
+            onChange={setDebtFilter}
+            size="sm"
+            className="w-full"
+            options={[
+              { value: "all", label: t(M.players.debtFilterAll), count: data.players.length },
+              { value: "debtor", label: t(M.players.debtFilterDebtors), count: debtorCount },
+              { value: "settled", label: t(M.players.debtFilterSettled), count: settledCount },
+            ]}
+          />
+        ) : null}
       </Card>
 
       {players.length ? (
@@ -226,11 +250,9 @@ export default function PlayersPage() {
         </Card>
       ) : (
         <EmptyState
-          icon={query || status !== "all" || teamFilter !== "all" ? <SearchX className="h-5 w-5" /> : <Users className="h-5 w-5" />}
-          title={t(query || status !== "all" ? M.players.noneFound : M.players.noneYet)}
-          description={t(
-            query || status !== "all" ? M.players.noneFoundDesc : M.players.noneYetDesc,
-          )}
+          icon={hasFilters ? <SearchX className="h-5 w-5" /> : <Users className="h-5 w-5" />}
+          title={t(hasFilters ? M.players.noneFound : M.players.noneYet)}
+          description={t(hasFilters ? M.players.noneFoundDesc : M.players.noneYetDesc)}
           action={
             canEdit ? (
               <Button size="sm" variant="soft" onClick={() => setFormOpen(true)}>

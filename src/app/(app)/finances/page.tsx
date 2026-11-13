@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   AlertCircle,
   ChevronLeft,
+  MessageCircle,
   Plus,
   ReceiptText,
   SearchX,
@@ -51,6 +52,22 @@ import { PaymentSheet } from "@/components/payment-sheet";
 import { FinanceNav } from "@/components/finance-nav";
 
 type StatusFilter = "all" | "open" | "paid";
+
+function normalizeSmsPhone(phone: string) {
+  const trimmed = phone.trim();
+  if (!trimmed || /(?:\b(?:ext(?:ension)?|x)\b|#|داخلی)/i.test(trimmed)) return "";
+  const plusCount = (trimmed.match(/\+/g) ?? []).length;
+  const hasLeadingPlus = trimmed.startsWith("+");
+  if (plusCount > 1 || (plusCount === 1 && !hasLeadingPlus)) return "";
+  const digits = trimmed
+    .replace(/[۰-۹٠-٩]/g, (digit) => {
+      const code = digit.charCodeAt(0);
+      return String(code >= 0x660 ? code - 0x660 : code - 0x6f0);
+    })
+    .replace(/\D/g, "");
+  if (digits.length < 7 || digits.length > 15) return "";
+  return hasLeadingPlus ? `+${digits}` : digits;
+}
 
 const statusBadge = (
   invoice: Invoice,
@@ -479,6 +496,7 @@ export default function FinancesPage() {
               <p className="mt-0.5 text-[11px] text-muted">
                 {t(M.finance.debtsSub)}
               </p>
+              <p className="mt-1 text-[10px] text-muted">{t(M.finance.smsReminderHint)}</p>
             </div>
             <Badge tone={debtRows.length ? "rose" : "emerald"}>
               {t(M.finance.debtorsHint, { count: faNum(debtRows.length) })}
@@ -487,34 +505,62 @@ export default function FinancesPage() {
 
           {debtRows.length ? (
             <div className="mt-2 divide-y divide-line/70">
-              {debtRows.map(({ player, tuition, shop, total }) => (
-                <Link
-                  key={player.id}
-                  href={`/players?id=${player.id}`}
-                  className="flex items-center gap-3 px-4 py-3 transition hover:bg-slate-50/70 sm:px-5"
-                >
-                  <Avatar name={player.fullName} size="sm" ring={false} />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[12px] font-semibold text-ink">{player.fullName}</p>
-                    <p className="text-[10px] text-muted">
-                      {data.teams.find((team) => team.id === player.teamId)?.name ?? t(M.finance.noTeam)}
-                    </p>
+              {debtRows.map(({ player, tuition, shop, total }) => {
+                const smsNumber = normalizeSmsPhone(player.phone);
+                const smsBody = t(M.finance.smsReminderBody, {
+                  name: player.fullName,
+                  club: data.club.name,
+                  amount: toman(total),
+                });
+                return (
+                  <div key={player.id} className="flex items-center gap-2 px-3 py-3 sm:gap-3 sm:px-5">
+                    <Link
+                      href={`/players?id=${player.id}`}
+                      className="flex min-w-0 flex-1 items-center gap-3 rounded-xl transition hover:bg-slate-50/70"
+                    >
+                      <Avatar name={player.fullName} size="sm" ring={false} />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[12px] font-semibold text-ink">{player.fullName}</p>
+                        <p className="text-[10px] text-muted">
+                          {data.teams.find((team) => team.id === player.teamId)?.name ?? t(M.finance.noTeam)}
+                        </p>
+                      </div>
+                      <div className="hidden shrink-0 items-center gap-4 text-[10px] text-muted sm:flex">
+                        <span>
+                          {t(M.finance.tuitionWord)}{" "}
+                          <b className="font-bold text-ink-soft">{tuition ? compactToman(tuition) : "—"}</b>
+                        </span>
+                        <span>
+                          {t(M.finance.shopWord)}{" "}
+                          <b className="font-bold text-ink-soft">{shop ? compactToman(shop) : "—"}</b>
+                        </span>
+                      </div>
+                      <p className="w-24 shrink-0 text-end text-[11px] font-extrabold text-rose-600">
+                        {toman(total)}
+                      </p>
+                    </Link>
+                    {smsNumber ? (
+                      <a
+                        href={`sms:${smsNumber}?body=${encodeURIComponent(smsBody)}`}
+                        className={buttonStyles("outline", "sm", "shrink-0 px-2 sm:px-3")}
+                        aria-label={`${t(M.finance.smsReminder)} ${player.fullName}`}
+                        title={t(M.finance.smsReminderHint)}
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        <span className="hidden sm:inline">{t(M.finance.smsReminder)}</span>
+                      </a>
+                    ) : (
+                      <span
+                        className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-muted/50"
+                        title={t(M.finance.smsNoPhone)}
+                        aria-label={t(M.finance.smsNoPhone)}
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                      </span>
+                    )}
                   </div>
-                  <div className="hidden shrink-0 items-center gap-4 text-[10px] text-muted sm:flex">
-                    <span>
-                      {t(M.finance.tuitionWord)}{" "}
-                      <b className="font-bold text-ink-soft">{tuition ? compactToman(tuition) : "—"}</b>
-                    </span>
-                    <span>
-                      {t(M.finance.shopWord)}{" "}
-                      <b className="font-bold text-ink-soft">{shop ? compactToman(shop) : "—"}</b>
-                    </span>
-                  </div>
-                  <p className="w-24 shrink-0 text-end text-[11px] font-extrabold text-rose-600">
-                    {toman(total)}
-                  </p>
-                </Link>
-              ))}
+                );
+              })}
               <div className="flex items-center justify-between bg-slate-50/80 px-4 py-3 text-[11px] sm:px-5">
                 <span className="font-medium text-ink">
                   {t(M.finance.debtsTotal, {

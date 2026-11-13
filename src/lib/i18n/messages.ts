@@ -374,6 +374,15 @@ export const M = {
     debtorsListHint: bi("{count} بازیکن با ماندهٔ بدهی", "{count} players with an outstanding balance"),
     noDebtors: bi("در حال حاضر بازیکن بدهکاری وجود ندارد.", "There are no players with outstanding debt."),
     openDebtorReport: bi("رفتن به گزارش بدهکاران", "Open debtor report"),
+    allTimeReport: bi("جمع کل درآمد و هزینه", "All-time income and expenses"),
+    allTimeReportHint: bi("از ابتدای ثبت گردش‌ها در دفتر کل", "Since the first ledger entries"),
+    allIncome: bi("کل درآمد", "Total income"),
+    allExpenses: bi("کل هزینه", "Total expenses"),
+    allNet: bi("خالص کل", "Net total"),
+    allTimeLedgerBasis: bi(
+      "بر اساس همهٔ درآمدها و هزینه‌های ثبت‌شده در دفتر کل؛ چک برگشتی در جمع محاسبه نمی‌شود.",
+      "Includes all income and expenses recorded in the ledger; bounced cheques are excluded.",
+    ),
   },
   form: {
     cancel: bi("انصراف", "Cancel"),
@@ -396,6 +405,9 @@ export const M = {
     notInsured: bi("بیمه ورزشی ندارد", "Not insured"),
     debt: bi("بدهی {amount}", "{amount} due"),
     settledChip: bi("تسویه", "Clear"),
+    debtFilterAll: bi("همه بازیکنان", "All players"),
+    debtFilterDebtors: bi("بدهکار", "In debt"),
+    debtFilterSettled: bi("تسویه‌شده", "Settled"),
     addPlayer: bi("افزودن بازیکن", "Add player"),
     noneFound: bi("بازیکنی یافت نشد", "No players found"),
     noneFoundDesc: bi(
@@ -731,6 +743,13 @@ export const M = {
     ),
     noTeam: bi("بدون تیم", "No team"),
     debtsTotal: bi("فاکتور و بدهی قبلی {tuition} · فروشگاه {shop}", "Invoices & opening balance {tuition} · Shop {shop}"),
+    smsReminder: bi("یادآوری پیامکی", "SMS reminder"),
+    smsReminderHint: bi("پیامک با متن آماده باز می‌شود؛ ارسال نهایی را شما تأیید می‌کنید.", "Opens a prepared SMS; you review and confirm sending."),
+    smsReminderBody: bi(
+      "سلام {name}، یادآوری می‌کنیم ماندهٔ بدهی ثبت‌شدهٔ شما در باشگاه {club} مبلغ {amount} است. لطفاً برای تسویه با باشگاه هماهنگ کنید.",
+      "Hello {name}, this is a reminder that your recorded balance at {club} is {amount}. Please contact the club to arrange payment.",
+    ),
+    smsNoPhone: bi("شمارهٔ تماس ثبت نشده", "No phone number on file"),
     allClearDebts: bi(
       "همه بازیکنان بدهی فاکتور و خرید فروشگاه را تسویه کرده‌اند.",
       "All players have settled invoice and shop debts.",

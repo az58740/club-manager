@@ -56,6 +56,7 @@ export default function DashboardPage() {
     const entries = entriesInMonth(allLedgerEntries(data), reportMonth);
     return ledgerTotals(entries);
   }, [data, reportMonth]);
+  const allTimeTotals = useMemo(() => ledgerTotals(allLedgerEntries(data)), [data]);
   const debtors = useMemo(() => debtorBreakdown(data), [data]);
   const statLabels = STAT_LABELS[data.club.sport];
 
@@ -560,7 +561,7 @@ export default function DashboardPage() {
       </div>
 
       {isManager ? (
-        <section className="grid gap-4 lg:grid-cols-2 lg:gap-5" aria-label={t(M.dashboard.managerReports)}>
+        <section className="grid gap-4 lg:grid-cols-3 lg:gap-5" aria-label={t(M.dashboard.managerReports)}>
           <Card className="p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -595,6 +596,31 @@ export default function DashboardPage() {
               </div>
             </div>
             <p className="mt-3 text-[10px] leading-5 text-muted">{t(M.dashboard.monthlyReportLedgerBasis)}</p>
+            <Link href="/finances/ledger" className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-brand-600">
+              {t(M.dashboard.openLedger)} <ChevronLeft className="h-3.5 w-3.5 ltr:rotate-180" />
+            </Link>
+          </Card>
+
+          <Card className="p-5">
+            <div>
+              <h2 className="text-[15px] font-bold text-ink">{t(M.dashboard.allTimeReport)}</h2>
+              <p className="mt-0.5 text-[11px] text-muted">{t(M.dashboard.allTimeReportHint)}</p>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              <div className="rounded-2xl bg-emerald-50 p-3">
+                <p className="text-[10px] text-emerald-700">{t(M.dashboard.allIncome)}</p>
+                <p className="mt-1 break-words text-[13px] font-extrabold text-emerald-800">{compactToman(allTimeTotals.income)}</p>
+              </div>
+              <div className="rounded-2xl bg-rose-50 p-3">
+                <p className="text-[10px] text-rose-700">{t(M.dashboard.allExpenses)}</p>
+                <p className="mt-1 break-words text-[13px] font-extrabold text-rose-800">{compactToman(allTimeTotals.expense)}</p>
+              </div>
+              <div className="rounded-2xl bg-brand-50 p-3">
+                <p className="text-[10px] text-brand-700">{t(M.dashboard.allNet)}</p>
+                <p className="mt-1 break-words text-[13px] font-extrabold text-brand-800">{compactToman(allTimeTotals.net)}</p>
+              </div>
+            </div>
+            <p className="mt-3 text-[10px] leading-5 text-muted">{t(M.dashboard.allTimeLedgerBasis)}</p>
             <Link href="/finances/ledger" className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-brand-600">
               {t(M.dashboard.openLedger)} <ChevronLeft className="h-3.5 w-3.5 ltr:rotate-180" />
             </Link>
